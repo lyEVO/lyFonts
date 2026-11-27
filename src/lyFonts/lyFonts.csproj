@@ -5,7 +5,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
     <PackageId>lyFonts</PackageId>
-    <Version>0.0.1</Version>
+    <Version>0.1.0</Version>
     <Authors>lysis evolutions</Authors>
     <Description>lysis fonts (lyFonts) is a port of FreeType to Cosmos and can be easily used within Cosmos-based operating systems.</Description>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>

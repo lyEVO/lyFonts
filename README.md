@@ -11,7 +11,34 @@ lyFonts brings FreeType to Cosmos. It renders TTF and OTF fonts.
 
 ## How to use it
 
-TODO
+Add the package:
+
+```bash
+dotnet add package lyFonts
+```
+
+Add a font to your project as an embedded resource, then load it and draw.
+
+```csharp
+using System.Reflection;
+using Cosmos.Kernel.System.Graphics;
+using lyFonts;
+
+// Load the font bytes from an embedded resource.
+using Stream? stream = Assembly.GetExecutingAssembly()
+    .GetManifestResourceStream("Kernel.Font.ttf");
+using MemoryStream memory = new MemoryStream();
+stream.CopyTo(memory);
+byte[] fontData = memory.ToArray();
+
+// A font at a size.
+lyFonts.Font font = new lyFonts.Font(fontData, 20);
+
+// Draw it on a canvas.
+Canvas canvas = Canvas.GetFullScreen();
+FontRenderer.DrawString(canvas, "Hello, world!", font, 20, Color.White, 40, 40);
+canvas.Display();
+```
 
 ## Credits
 
