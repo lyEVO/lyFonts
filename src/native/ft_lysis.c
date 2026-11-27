@@ -7,12 +7,14 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <stddef.h>
+#include <stdlib.h>
 
 /* FreeType shim */
 
 static FT_Library _library = NULL;
-static FT_Face _faces[8];
+static FT_Face* _faces = NULL;
 static int _faceCount = 0;
+static int _faceCapacity = 0;
 
 int lysis_ft_init(void)
 {
@@ -25,8 +27,17 @@ int lysis_ft_load_face(const unsigned char* data, long size)
 {
     FT_Face face;
 
-    if (_library == NULL || _faceCount >= 8)
+    if (_library == NULL)
         return -1;
+    if (_faceCount >= _faceCapacity)
+    {
+        int newCapacity = _faceCapacity == 0 ? 8 : _faceCapacity * 2;
+        FT_Face* grown = (FT_Face*)realloc(_faces, (size_t)newCapacity * sizeof(FT_Face));
+        if (grown == NULL)
+            return -1;
+        _faces = grown;
+        _faceCapacity = newCapacity;
+    }
     if (FT_New_Memory_Face(_library, data, size, 0, &face) != 0)
         return -1;
 
@@ -184,6 +195,9 @@ void lysis_ft_done(void)
     for (i = 0; i < _faceCount; i++)
         FT_Done_Face(_faces[i]);
     _faceCount = 0;
+    free(_faces);
+    _faces = NULL;
+    _faceCapacity = 0;
     if (_library != NULL)
     {
         FT_Done_FreeType(_library);
