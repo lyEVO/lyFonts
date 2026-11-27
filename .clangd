@@ -1,0 +1,4 @@
+CompileFlags:
+  Add:
+    - -I/Users/creeper/Documents/GitHub/lyFonts/src/native/freetype-config
+    - -I/Users/creeper/Documents/GitHub/lyFonts/src/native/freetype/include

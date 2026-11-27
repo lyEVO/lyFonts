@@ -1,0 +1,3 @@
+[submodule "src/native/freetype"]
+	path = src/native/freetype
+	url = https://gitlab.freedesktop.org/freetype/freetype.git

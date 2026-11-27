@@ -1,0 +1,8 @@
+<Project>
+  <!-- Native wiring -->
+  <ItemGroup>
+    <GCCProject Include="$(MSBuildThisFileDirectory)../native" />
+    <GCCIncludePath Include="$(MSBuildThisFileDirectory)../native/freetype-config" />
+    <GCCIncludePath Include="$(MSBuildThisFileDirectory)../native/freetype/include" />
+  </ItemGroup>
+</Project>
