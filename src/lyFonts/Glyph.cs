@@ -14,7 +14,7 @@ public class Glyph
     /// <summary>
     /// Make a glyph from a render.
     /// </summary>
-    public Glyph(byte[]? coverage, int width, int height, int offsetX, int offsetY, int advance)
+    public Glyph(byte[]? coverage, int width, int height, int offsetX, int offsetY, float advance)
     {
         Coverage = coverage;
         Width = width;
@@ -54,5 +54,5 @@ public class Glyph
     /// <summary>
     /// How far the pen moves right after this glyph.
     /// </summary>
-    public int Advance { get; }
+    public float Advance { get; }
 }

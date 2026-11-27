@@ -63,7 +63,7 @@ public unsafe class Face : IDisposable
     /// <summary>
     /// Get the line height at a size.
     /// </summary>
-    public int GetLineHeight(int pixelSize)
+    public int GetLineHeight(float pixelSize)
     {
         if (!_heights.TryGetValue(pixelSize, out int height))
         {
@@ -78,7 +78,7 @@ public unsafe class Face : IDisposable
     /// Get the ascent at a size.
     /// Distance from the top of the line to the baseline.
     /// </summary>
-    public int GetAscent(int pixelSize)
+    public int GetAscent(float pixelSize)
     {
         if (!_ascents.TryGetValue(pixelSize, out int ascent))
         {
@@ -93,7 +93,7 @@ public unsafe class Face : IDisposable
     /// Get the descent at a size.
     /// Distance from the baseline to the bottom of the line.
     /// </summary>
-    public int GetDescent(int pixelSize)
+    public int GetDescent(float pixelSize)
     {
         if (!_descents.TryGetValue(pixelSize, out int descent))
         {
@@ -107,10 +107,10 @@ public unsafe class Face : IDisposable
     /// <summary>
     /// Get the kerning for two characters at a size.
     /// </summary>
-    public int GetKerning(char left, char right, int pixelSize)
+    public float GetKerning(char left, char right, float pixelSize)
     {
         SetSize(pixelSize);
-        int kerning = Native.lysis_ft_kerning(_handle, left, right);
+        float kerning = Native.lysis_ft_kerning(_handle, left, right);
         return kerning;
     }
 
@@ -126,12 +126,12 @@ public unsafe class Face : IDisposable
     /// <summary>
     /// Get the glyph for a character at a size.
     /// </summary>
-    public Glyph? GetGlyph(char c, int pixelSize)
+    public Glyph? GetGlyph(char c, float pixelSize)
     {
         if (pixelSize is <= 0 or > ushort.MaxValue)
             throw new ArgumentOutOfRangeException(nameof(pixelSize), $"Text size ({pixelSize}) must be between 1 and {ushort.MaxValue}");
 
-        int key = (pixelSize << 16) | c;
+        (float, char) key = (pixelSize, c);
         if (!_glyphs.TryGetValue(key, out Glyph? glyph))
         {
             glyph = Rasterize(c, pixelSize);
@@ -143,7 +143,7 @@ public unsafe class Face : IDisposable
     /// <summary>
     /// Render a single glyph.
     /// </summary>
-    private Glyph? Rasterize(char c, int pixelSize)
+    private Glyph? Rasterize(char c, float pixelSize)
     {
         SetSize(pixelSize);
 
@@ -151,7 +151,7 @@ public unsafe class Face : IDisposable
         int glyphRows;
         int glyphLeft;
         int glyphTop;
-        int glyphAdvance;
+        float glyphAdvance;
 
         // first call measures the glyph, and the buffer comes after
         int result = Native.lysis_ft_render(_handle, c, null, 0, &glyphWidth, &glyphRows, &glyphLeft, &glyphTop, &glyphAdvance);
@@ -176,12 +176,14 @@ public unsafe class Face : IDisposable
     /// <summary>
     /// Set the size, but only when it is different.
     /// </summary>
-    private void SetSize(int pixelSize)
+    private void SetSize(float pixelSize)
     {
         if (pixelSize == _size)
             return;
 
-        if (Native.lysis_ft_set_size(_handle, pixelSize) != 0)
+        // FreeType takes 26.6 fixed point sizes
+        int size26_6 = (int)Math.Round(pixelSize * 64);
+        if (Native.lysis_ft_set_size(_handle, size26_6) != 0)
             throw new InvalidOperationException("FreeType set size failed.");
 
         _size = pixelSize;
@@ -239,27 +241,27 @@ public unsafe class Face : IDisposable
     /// <summary>
     /// Current face size.
     /// </summary>
-    private int? _size;
+    private float? _size;
 
     /// <summary>
     /// Rendered glyphs, by size and character.
     /// </summary>
-    private readonly Dictionary<int, Glyph?> _glyphs = new();
+    private readonly Dictionary<(float, char), Glyph?> _glyphs = new();
 
     /// <summary>
     /// Line heights by size.
     /// </summary>
-    private readonly Dictionary<int, int> _heights = new();
+    private readonly Dictionary<float, int> _heights = new();
 
     /// <summary>
     /// Ascents by size.
     /// </summary>
-    private readonly Dictionary<int, int> _ascents = new();
+    private readonly Dictionary<float, int> _ascents = new();
 
     /// <summary>
     /// Descents by size.
     /// </summary>
-    private readonly Dictionary<int, int> _descents = new();
+    private readonly Dictionary<float, int> _descents = new();
 
     /// <summary>
     /// Cached family name.

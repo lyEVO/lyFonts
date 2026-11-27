@@ -20,7 +20,7 @@ public class Font : IDisposable
     /// </summary>
     /// <param name="face">The FreeType face to read glyphs from.</param>
     /// <param name="sizePx">The default text size in pixels.</param>
-    public Font(Face face, int sizePx = 16)
+    public Font(Face face, float sizePx = 16)
     {
         Face = face;
         SizePx = sizePx;
@@ -31,7 +31,7 @@ public class Font : IDisposable
     /// </summary>
     /// <param name="fontData">The raw bytes of the font file.</param>
     /// <param name="sizePx">The default text size in pixels.</param>
-    public Font(byte[] fontData, int sizePx = 16)
+    public Font(byte[] fontData, float sizePx = 16)
         : this(new Face(fontData), sizePx)
     {
         _ownsFace = true;
@@ -42,7 +42,7 @@ public class Font : IDisposable
     /// </summary>
     /// <param name="path">The path of the font file.</param>
     /// <param name="sizePx">The default text size in pixels.</param>
-    public Font(string path, int sizePx = 16)
+    public Font(string path, float sizePx = 16)
         : this(File.ReadAllBytes(path), sizePx)
     {
     }
@@ -55,7 +55,7 @@ public class Font : IDisposable
     /// <summary>
     /// The text size in pixels used when no explicit size is given.
     /// </summary>
-    public int SizePx { get; set; }
+    public float SizePx { get; set; }
 
     /// <summary>
     /// Get the family name of the font.
@@ -86,7 +86,7 @@ public class Font : IDisposable
     /// <summary>
     /// Gets the glyph for a character at the given size.
     /// </summary>
-    public Glyph? GetGlyph(char c, int sizePx)
+    public Glyph? GetGlyph(char c, float sizePx)
     {
         return Face.GetGlyph(c, sizePx);
     }
@@ -104,7 +104,7 @@ public class Font : IDisposable
     /// Gets the distance from the top of a text line
     /// to the baseline at the given size.
     /// </summary>
-    public int GetAscent(int sizePx)
+    public int GetAscent(float sizePx)
     {
         return Face.GetAscent(sizePx);
     }
@@ -122,7 +122,7 @@ public class Font : IDisposable
     /// Gets the distance between the tops of two
     /// consecutive text lines at the given size.
     /// </summary>
-    public int GetLineHeight(int sizePx)
+    public int GetLineHeight(float sizePx)
     {
         return Face.GetLineHeight(sizePx);
     }
@@ -146,7 +146,7 @@ public class Font : IDisposable
     /// <param name="ascent">The distance from the top of a text line to the baseline.</param>
     /// <param name="descent">The distance from the baseline to the bottom of the line. Negative.</param>
     /// <param name="lineGap">The extra spacing between two lines.</param>
-    public void GetLineMetrics(int sizePx, out int ascent, out int descent, out int lineGap)
+    public void GetLineMetrics(float sizePx, out int ascent, out int descent, out int lineGap)
     {
         ascent = Face.GetAscent(sizePx);
         descent = Face.GetDescent(sizePx);
@@ -158,7 +158,7 @@ public class Font : IDisposable
     /// at this font's size, without kerning.
     /// Zero when the font has no glyph for the character.
     /// </summary>
-    public int GetAdvance(char c)
+    public float GetAdvance(char c)
     {
         return GetAdvance(c, SizePx);
     }
@@ -168,7 +168,7 @@ public class Font : IDisposable
     /// at the given size, without kerning.
     /// Zero when the font has no glyph for the character.
     /// </summary>
-    public int GetAdvance(char c, int sizePx)
+    public float GetAdvance(char c, float sizePx)
     {
         return Face.GetGlyph(c, sizePx)?.Advance ?? 0;
     }
@@ -177,7 +177,7 @@ public class Font : IDisposable
     /// Gets the kerning adjustment for a pair
     /// of characters at this font's size.
     /// </summary>
-    public int GetKerning(char left, char right)
+    public float GetKerning(char left, char right)
     {
         return GetKerning(left, right, SizePx);
     }
@@ -186,7 +186,7 @@ public class Font : IDisposable
     /// Gets the kerning adjustment for a pair
     /// of characters at the given size.
     /// </summary>
-    public int GetKerning(char left, char right, int sizePx)
+    public float GetKerning(char left, char right, float sizePx)
     {
         return Face.GetKerning(left, right, sizePx);
     }
@@ -194,13 +194,13 @@ public class Font : IDisposable
     /// <summary>
     /// Gets the widest advance any printable character needs.
     /// </summary>
-    public int GetMaxAdvance()
+    public float GetMaxAdvance()
     {
-        int maxAdvance = 0;
+        float maxAdvance = 0;
 
         for (char c = '!'; c <= '~'; c++)
         {
-            int advance = GetAdvance(c, SizePx);
+            float advance = GetAdvance(c, SizePx);
             if (advance > maxAdvance)
             {
                 maxAdvance = advance;
@@ -214,7 +214,7 @@ public class Font : IDisposable
     /// Measures the width that drawing the given text
     /// at this font's size would use.
     /// </summary>
-    public int MeasureString(string text)
+    public float MeasureString(string text)
     {
         return MeasureString(text, SizePx);
     }
@@ -223,9 +223,9 @@ public class Font : IDisposable
     /// Measures the width that drawing the given text
     /// at the given size would use.
     /// </summary>
-    public int MeasureString(string text, int sizePx)
+    public float MeasureString(string text, float sizePx)
     {
-        int width = 0;
+        float width = 0;
         char previous = '\0';
 
         for (int i = 0; i < text.Length; i++)

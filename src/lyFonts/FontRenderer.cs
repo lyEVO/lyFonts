@@ -39,7 +39,7 @@ public static class FontRenderer
     /// <param name="color">The color of the text.</param>
     /// <param name="x">The left edge of the text.</param>
     /// <param name="y">The top of the text line.</param>
-    public static void DrawString(Canvas canvas, string text, Font font, int sizePx, Color color, int x, int y)
+    public static void DrawString(Canvas canvas, string text, Font font, float sizePx, Color color, int x, int y)
     {
         ArgumentNullException.ThrowIfNull(canvas);
         ArgumentNullException.ThrowIfNull(text);
@@ -52,7 +52,7 @@ public static class FontRenderer
         int width = canvas.Width;
         int height = canvas.Height;
         int baseline = y + font.GetAscent(sizePx);
-        int penX = x;
+        float penX = x;
         char previous = '\0';
 
         for (int i = 0; i < text.Length; i++)
@@ -65,7 +65,7 @@ public static class FontRenderer
             if (previous != '\0')
                 penX += font.GetKerning(previous, c, sizePx);
 
-            DrawGlyph(buffer, width, height, glyph, penX + glyph.OffsetX, baseline + glyph.OffsetY, color);
+            DrawGlyph(buffer, width, height, glyph, (int)Math.Round(penX) + glyph.OffsetX, baseline + glyph.OffsetY, color);
             penX += glyph.Advance;
             previous = c;
         }

@@ -45,11 +45,12 @@ int lysis_ft_load_face(const unsigned char* data, long size)
     return _faceCount++;
 }
 
-int lysis_ft_set_size(int face, int pixelSize)
+int lysis_ft_set_size(int face, int size26_6)
 {
-    if (face < 0 || face >= _faceCount || pixelSize <= 0)
+    if (face < 0 || face >= _faceCount || size26_6 <= 0)
         return -1;
-    return FT_Set_Pixel_Sizes(_faces[face], 0, (FT_UInt)pixelSize);
+    // size is 26.6 fixed point in points, at 72 dpi a point is a pixel
+    return FT_Set_Char_Size(_faces[face], 0, (FT_F26Dot6)size26_6, 72, 72);
 }
 
 int lysis_ft_line_height(int face)
@@ -104,7 +105,7 @@ int lysis_ft_style_name(int face, char* buf, int capacity)
 int lysis_ft_render(int face, unsigned long charcode,
                     unsigned char* outBitmap, int outCapacity,
                     int* outWidth, int* outRows,
-                    int* outLeft, int* outTop, int* outAdvance)
+                    int* outLeft, int* outTop, float* outAdvance)
 {
     FT_Face f;
     FT_Bitmap* bmp;
@@ -131,7 +132,7 @@ int lysis_ft_render(int face, unsigned long charcode,
     *outRows = bmp->rows;
     *outLeft = f->glyph->bitmap_left;
     *outTop = f->glyph->bitmap_top;
-    *outAdvance = (int)((f->glyph->advance.x + 32) >> 6);
+    *outAdvance = (float)f->glyph->advance.x / 64.0f;
 
     if (outBitmap == NULL || outCapacity < needed)
         return -2;
@@ -162,7 +163,7 @@ int lysis_ft_render(int face, unsigned long charcode,
     return 0;
 }
 
-int lysis_ft_kerning(int face, unsigned long left, unsigned long right)
+float lysis_ft_kerning(int face, unsigned long left, unsigned long right)
 {
     FT_Face f;
     FT_UInt leftGlyph;
@@ -179,7 +180,7 @@ int lysis_ft_kerning(int face, unsigned long left, unsigned long right)
         return 0;
     if (FT_Get_Kerning(f, leftGlyph, rightGlyph, FT_KERNING_DEFAULT, &delta) != 0)
         return 0;
-    return (int)((delta.x + 32) >> 6);
+    return (float)delta.x / 64.0f;
 }
 
 int lysis_ft_has_glyph(int face, unsigned long charcode)
